@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "demoapp.mysql.name" . }}
+  labels:
+    app: {{ template "demoapp.name" . }}
+    chart: {{ template "demoapp.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "demoapp.name" . }}
+      release: {{ .Release.Name }}
+      component: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ template "demoapp.name" . }}
+        release: {{ .Release.Name }}
+        component: mysql
+    spec:
+      restartPolicy: Always
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ template "demoapp.mysql.name" . }}
+      initContainers:
+        - name: "remove-lost-found"
+          image: "busybox:1.25.0"
+          command: 
+            - rm
+            - -fr
+            - /var/lib/mysql/lost+found
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+      containers:
+        - name: mysql
+          image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+          envFrom:
+            - configMapRef:
+                name: {{ template "demoapp.mysql-env.name" . }}
+            - secretRef:
+                name: {{ template "demoapp.mysql-env.name" . }}

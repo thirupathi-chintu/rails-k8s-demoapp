@@ -1,0 +1,45 @@
+mysql:
+  image:
+    repository: mysql
+    tag: 5.7.21
+  storage:
+    size: 8Gi
+    className: standard
+
+redis:
+  image:
+    repository: redis
+    tag: 4.0.9
+  storage:
+    size: 8Gi
+    className: standard
+
+puma:
+  replicas: 2
+
+sidekiq:
+  replicas: 1
+  timeout: 60
+
+rails:
+  image:
+    repository: demoapp
+    tag: 0.0.1
+    setupDbTag: 0.0.1
+
+ingress:
+  tlsSecretName: demoapp-puma-tls
+  # required from --set parameter
+  # helm upgrade release-name . --set ingress.host=demoapp-puma.${MINIKUBE_IP}.nip.io
+  # host: demoapp-puma.${MINIKUBE_IP}.nip.io
+
+env:
+  configmap:
+    MYSQL_USER: demoapp
+    MYSQL_DATABASE: demoapp_production
+    RAILS_SERVE_STATIC_FILES: "true"
+    RAILS_LOG_TO_STDOUT: "true"
+  secret:
+    MYSQL_PASSWORD: secret
+    MYSQL_ROOT_PASSWORD: topsecret
+    SECRET_KEY_BASE: "123"

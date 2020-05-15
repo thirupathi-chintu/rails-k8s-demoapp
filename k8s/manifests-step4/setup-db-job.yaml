@@ -1,0 +1,24 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: demoapp-setup-db
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        app: demoapp
+        component: setup-db
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: setup-db
+          image: demoapp:0.0.1
+          command:
+            - ./bin/setup-db
+          envFrom:
+            - configMapRef:
+                name: demoapp-rails-env
+            - secretRef:
+                name: demoapp-rails-env

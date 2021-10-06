@@ -10,7 +10,7 @@ gem 'turbolinks', '~> 5'
 gem 'redis', '~> 4.0'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'webpacker', '~> 3.4'
-gem 'sidekiq', '~> 5.1.2'
+gem 'sidekiq', '~> 5.2.0'
 gem 'slim-rails', '~> 3.1.3'
 gem 'active_link_to', '~> 1.0.5'
 gem 'health_check', '~> 3.0'
